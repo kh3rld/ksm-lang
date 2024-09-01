@@ -36,6 +36,15 @@ func (l *Lexer) NextToken() Token {
 	case '+':
 		tok = newToken(PLUS, l.ch)
 		// Add more cases for other tokens like minus, asterisk, etc.
+		case ';':  // Handle semicolon
+        tok = newToken(SEMICOLON, l.ch)
+    case ',':
+        tok = newToken(COMMA, l.ch)  // Handle comma
+    case '[':
+        tok = newToken(LBRACKET, l.ch)  // Handle opening bracket
+    case ']':
+        tok = newToken(RBRACKET, l.ch) 
+
 	case 0:
 		tok.Literal = ""
 		tok.Type = EOF
