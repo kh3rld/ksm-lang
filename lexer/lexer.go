@@ -35,10 +35,36 @@ func (l *Lexer) NextToken() Token {
 		tok = newToken(ASSIGN, l.ch)
 	case '+':
 		tok = newToken(PLUS, l.ch)
-	// Add more cases for other tokens like minus, asterisk, etc.
+		// Add more cases for other tokens like minus, asterisk, etc.
 	case 0:
 		tok.Literal = ""
 		tok.Type = EOF
+	case '"':
+		tok.Type = STRING
+		tok.Literal = l.readString()
+	// Handling for true, false, and null literals
+	case 't':
+		if l.peekString("true") {
+			tok = Token{Type: TRUE, Literal: "true"}
+			l.readCharN(4)
+		} else {
+			tok = newToken(ILLEGAL, l.ch)
+		}
+	case 'f':
+		if l.peekString("false") {
+			tok = Token{Type: FALSE, Literal: "false"}
+			l.readCharN(5)
+		} else {
+			tok = newToken(ILLEGAL, l.ch)
+		}
+	case 'n':
+		if l.peekString("null") {
+			tok = Token{Type: NULL, Literal: "null"}
+			l.readCharN(4)
+		} else {
+			tok = newToken(ILLEGAL, l.ch)
+		}
+
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
@@ -89,4 +115,29 @@ func (l *Lexer) readNumber() string {
 		l.readChar()
 	}
 	return l.input[position:l.position]
+}
+func (l *Lexer) readString() string {
+	position := l.position + 1
+	for {
+		l.readChar()
+		if l.ch == '"' || l.ch == 0 {
+			break
+		}
+	}
+	return l.input[position:l.position]
+}
+
+func (l *Lexer) peekString(expected string) bool {
+	for i := 0; i < len(expected); i++ {
+		if l.input[l.position+i] != expected[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func (l *Lexer) readCharN(n int) {
+	for i := 0; i < n; i++ {
+		l.readChar()
+	}
 }
