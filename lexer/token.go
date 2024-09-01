@@ -26,6 +26,12 @@ const (
 
 	// Keywords
 	LET = "LET"
+
+	// Literal Types
+	STRING = "STRING"
+	TRUE   = "TRUE"
+	FALSE  = "FALSE"
+	NULL   = "NULL"
 )
 
 type TokenType string
