@@ -36,6 +36,13 @@ func (l *Lexer) readNumber() string {
 	for isDigit(l.ch) {
 		l.readChar()
 	}
+	// Check if there is a decimal point
+	if l.ch == "." {
+		l.readChar()
+		for isDigit(l.ch) {
+			l.readChar()
+		}
+	}
 	return l.input[position:l.position]
 }
 
