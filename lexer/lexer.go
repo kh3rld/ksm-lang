@@ -90,12 +90,18 @@ func (l *Lexer) NextToken() token.Token {
 		t = newToken(token.SPACE, l.ch)
 	case "{":
 		t = newToken(token.CURLYOPEN, l.ch)
+	case "}":
+		t = newToken(token.CURLYCLOSE, l.ch)
+	case "(":
+		t = newToken(token.BRACKOPEN, l.ch)
+	case ")":
+		t = newToken(token.BRACKCLOSE, l.ch)
 	default:
 		if isLetter(l.ch) {
 			t.Literal = l.readIdentifier()
 			t.Type = token.IDENT
 			return t
-		} else if isDigit(l.ch) {
+		} else if isDigit(l.ch) || l.ch == "." {
 			t.Literal = l.readNumber()
 			t.Type = token.NUMBER
 			return t
