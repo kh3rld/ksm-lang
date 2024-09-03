@@ -2,14 +2,20 @@ package main
 
 import (
 	"fmt"
-	"ksm-lang/lexer"
+	"os"
+	"ksm-lang/repl"
 )
 
 func main() {
-	input := `let nums = [1, 2, 3];`
-	l := lexer.New(input)
-
-	for tok := l.NextToken(); tok.Type != lexer.EOF; tok = l.NextToken() {
-		fmt.Printf("%+v\n", tok)
+	if len(os.Args) > 1 {
+		fileName := os.Args[1]
+		content, err := os.ReadFile(fileName)
+		if err != nil {
+			fmt.Printf("Error reading file: %v\n", err)
+			return
+		}
+ 	    repl.Run(string(content))
+	} else {
+		repl.Start(os.Stdin, os.Stdout)
 	}
 }

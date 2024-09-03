@@ -1,0 +1,14 @@
+let arr = [1, 2, 3, 4];
+let firstElement = arr.first();
+let lastElement = arr.last();
+let length = arr.length();
+
+let str = "hello";
+let greeting = str.concat(" world");
+let sub = str.substring(1, 4);
+
+let obj = { "name": "kisumu", "type": "toy language" };
+let objName = obj.get("name");
+let keys = obj.keys();
+
+return greeting; // Should return "hello world"
