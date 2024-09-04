@@ -96,6 +96,8 @@ func (l *Lexer) NextToken() token.Token {
 		t = NewToken(token.BRACKOPEN, l.ch)
 	case ")":
 		t = NewToken(token.BRACKCLOSE, l.ch)
+	case "\x00":
+		t = NewToken(token.EOF, l.ch)
 	default:
 		if isLetter(l.ch) {
 			t.Literal = l.readIdentifier()
