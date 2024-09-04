@@ -36,6 +36,13 @@ func (l *Lexer) readNumber() string {
 	for isDigit(l.ch) {
 		l.readChar()
 	}
+	// Check if there is a decimal point
+	if l.ch == "." {
+		l.readChar()
+		for isDigit(l.ch) {
+			l.readChar()
+		}
+	}
 	return l.input[position:l.position]
 }
 
@@ -47,7 +54,7 @@ func New(input string) *Lexer {
 
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
-		l.ch = "0"
+		l.ch = "\x00"
 	} else {
 		l.ch = string(l.input[l.readPosition])
 	}
@@ -83,12 +90,18 @@ func (l *Lexer) NextToken() token.Token {
 		t = newToken(token.SPACE, l.ch)
 	case "{":
 		t = newToken(token.CURLYOPEN, l.ch)
+	case "}":
+		t = newToken(token.CURLYCLOSE, l.ch)
+	case "(":
+		t = newToken(token.BRACKOPEN, l.ch)
+	case ")":
+		t = newToken(token.BRACKCLOSE, l.ch)
 	default:
 		if isLetter(l.ch) {
 			t.Literal = l.readIdentifier()
 			t.Type = token.IDENT
 			return t
-		} else if isDigit(l.ch) {
+		} else if isDigit(l.ch) || l.ch == "." {
 			t.Literal = l.readNumber()
 			t.Type = token.NUMBER
 			return t
