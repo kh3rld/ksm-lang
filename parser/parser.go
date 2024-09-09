@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/kh3rld/ksm-lang/lexer"
@@ -11,7 +12,7 @@ type Parser struct {
 	l         *lexer.Lexer
 	curToken  token.Token
 	peekToken token.Token
-	Value     int
+	errors    []string
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -23,13 +24,17 @@ func New(l *lexer.Lexer) *Parser {
 
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
-	p.peekToken = p.curToken
+	p.peekToken = p.l.NextToken()
 }
 
 func (p *Parser) ParseProgram() *Program {
 	program := &Program{}
 
 	for p.curToken.Type != token.EOF {
+		if p.curToken.Type == token.SPACE {
+			p.nextToken()
+			continue
+		}
 		stmt := p.parseStatement()
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
@@ -39,20 +44,50 @@ func (p *Parser) ParseProgram() *Program {
 	return program
 }
 
-func (p *Parser) parseStatement() Statement {
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) parseStatement() Node {
 	switch p.curToken.Type {
 	case token.NUMBER:
-		return p.parseNumber()
+		return p.parseExpression()
+	case token.PLUS, token.MINUS:
+		return p.parseExpression()
 	default:
 		return nil
 	}
 }
 
-func (p *Parser) parseNumber() *Parser {
-	value, err := strconv.Atoi(p.curToken.Literal)
+func (p *Parser) parseNumber() *NumberExpr {
+	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
 	if err != nil {
+		p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
 		return nil
 	}
-	return &Parser{Value: value}
+	return &NumberExpr{Value: value}
 }
 
+func (p *Parser) parseExpression() *BinaryExpr {
+	left := p.parseNumber()
+	if left == nil {
+		return nil
+	}
+
+	operator := p.curToken
+	p.nextToken()
+	if p.curToken.Type != token.NUMBER {
+		p.errors = append(p.errors, "Expected a number after operator")
+		return nil
+	}
+	right := p.parseNumber()
+	if right == nil {
+		return nil
+	}
+
+	return &BinaryExpr{
+		Left:     left,
+		Operator: operator.Literal,
+		Right:    right,
+	}
+}
