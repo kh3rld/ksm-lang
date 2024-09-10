@@ -19,7 +19,7 @@ func isDigit(ch string) bool {
 	return ch >= "0" && ch <= "9"
 }
 
-func newToken(tokenType token.TokenType, ch string) token.Token {
+func NewToken(tokenType token.TokenType, ch string) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
@@ -54,7 +54,7 @@ func New(input string) *Lexer {
 
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
-		l.ch = "\x00"
+		l.ch = "\x00" // EOF
 	} else {
 		l.ch = string(l.input[l.readPosition])
 	}
@@ -65,37 +65,43 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() token.Token {
 	var t token.Token
 
+	// Skip whitespace
+	for l.ch == " " || l.ch == "\t" || l.ch == "\n" {
+		l.readChar()
+	}
+
 	switch l.ch {
-	case "=":
-		t = newToken(token.ASSIGN, l.ch)
 	case "+":
-		t = newToken(token.PLUS, l.ch)
+		t = NewToken(token.PLUS, l.ch)
 	case "-":
-		t = newToken(token.MINUS, l.ch)
+		t = NewToken(token.MINUS, l.ch)
 	case "*":
-		t = newToken(token.TIMES, l.ch)
+		t = NewToken(token.TIMES, l.ch)
 	case "/":
-		t = newToken(token.DIVIDE, l.ch)
+		t = NewToken(token.DIVIDE, l.ch)
 	case "%":
-		t = newToken(token.MODULUS, l.ch)
+		t = NewToken(token.MODULUS, l.ch)
 	case ",":
-		t = newToken(token.COMMA, l.ch)
+		t = NewToken(token.COMMA, l.ch)
 	case ";":
-		t = newToken(token.SEMICOLON, l.ch)
+		t = NewToken(token.SEMICOLON, l.ch)
 	case ":":
-		t = newToken(token.COLON, l.ch)
+		t = NewToken(token.COLON, l.ch)
 	case "==":
-		t = newToken(token.EQUAL, l.ch)
+		t = NewToken(token.EQUAL, l.ch)
 	case " ":
-		t = newToken(token.SPACE, l.ch)
+		t = NewToken(token.SPACE, l.ch)
 	case "{":
-		t = newToken(token.CURLYOPEN, l.ch)
+		t = NewToken(token.CURLYOPEN, l.ch)
 	case "}":
-		t = newToken(token.CURLYCLOSE, l.ch)
+		t = NewToken(token.CURLYCLOSE, l.ch)
 	case "(":
-		t = newToken(token.BRACKOPEN, l.ch)
+		t = NewToken(token.BRACKOPEN, l.ch)
 	case ")":
-		t = newToken(token.BRACKCLOSE, l.ch)
+		t = NewToken(token.BRACKCLOSE, l.ch)
+	case "\x00":
+		t.Type = token.EOF
+		t.Literal = ""
 	default:
 		if isLetter(l.ch) {
 			t.Literal = l.readIdentifier()
@@ -106,7 +112,7 @@ func (l *Lexer) NextToken() token.Token {
 			t.Type = token.NUMBER
 			return t
 		} else {
-			t = newToken(token.ILLEGAL, l.ch)
+			t = NewToken(token.ILLEGAL, l.ch)
 		}
 	}
 

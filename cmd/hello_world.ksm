@@ -1,0 +1,10 @@
+// Example of basic arithmetic operations
+
+// Addition
+5 + 3
+
+// Subtraction
+10 - 4
+
+// Floating-point arithmetic
+3.14 + 2.71

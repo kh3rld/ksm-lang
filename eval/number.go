@@ -18,10 +18,6 @@ func (n *Number) ToInt() int {
 	return int(n.Value)
 }
 
-func (n *Number) ToFloat() float64 {
-	return n.Value
-}
-
 func (n *Number) String() string {
 	return fmt.Sprintf("%f", n.Value)
 }
