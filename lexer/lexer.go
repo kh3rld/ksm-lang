@@ -52,13 +52,6 @@ func New(input string) *Lexer {
 	return l
 }
 
-func (l *Lexer) peekChar() string {
-	if l.readPosition >= len(l.input) {
-		return "\x00"
-	}
-	return string(l.input[l.readPosition])
-}
-
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = "\x00" // EOF
@@ -67,21 +60,6 @@ func (l *Lexer) readChar() {
 	}
 	l.position = l.readPosition
 	l.readPosition++
-}
-
-func (l *Lexer) readNumberWithSign(sign string) string {
-	position := l.position
-	l.readChar()
-	for isDigit(l.ch) {
-		l.readChar()
-	}
-	if l.ch == "." {
-		l.readChar()
-		for isDigit(l.ch) {
-			l.readChar()
-		}
-	}
-	return sign + l.input[position:l.position]
 }
 
 func (l *Lexer) NextToken() token.Token {
@@ -97,12 +75,6 @@ func (l *Lexer) NextToken() token.Token {
 		t = NewToken(token.PLUS, l.ch)
 	case "-":
 		t = NewToken(token.MINUS, l.ch)
-		if isDigit(l.peekChar()) {
-			t.Literal = l.readNumberWithSign("-")
-			t.Type = token.NUMBER
-		} else {
-			t = NewToken(token.MINUS, l.ch)
-		}
 	case "*":
 		t = NewToken(token.TIMES, l.ch)
 	case "/":
