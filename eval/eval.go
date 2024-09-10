@@ -17,9 +17,6 @@ func (e *Evaluator) Eval(node parser.Node) *Number {
 			return nil
 		}
 		return EvaluateArithmetic(left, right, n.Operator)
-	}
-	return nil
-}
 
 func (e *Evaluator) VisitNumberExpr(expr *parser.NumberExpr) interface{} {
 	return &Number{Value: expr.Value}
