@@ -102,6 +102,7 @@ func (l *Lexer) NextToken() token.Token {
 	case "\x00":
 		t.Type = token.EOF
 		t.Literal = ""
+
 	default:
 		if isLetter(l.ch) {
 			t.Literal = l.readIdentifier()
