@@ -4,7 +4,7 @@ A programming language written in Go with a syntax similar to Go. KSM is designe
 
 ## Project Overview
 
-KSM aims to be an educational tool for learning about programming languages and interpreters. It supports several fundamental data structures and provides a minimal set of methods for each, allowing for manipulation and interaction with data.
+KSM supports several fundamental data structures and provides a minimal set of methods for each, allowing for manipulation and interaction with data.
 
 ## Key Features
 
