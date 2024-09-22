@@ -59,17 +59,47 @@ func (p *Parser) parseStatement() Node {
 	}
 }
 
-func (p *Parser) parseNumber() *NumberExpr {
-	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
-	if err != nil {
-		p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
+// func (p *Parser) ParseNumber() *NumberExpr {
+// 	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
+// 	if err != nil {
+// 		p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
+// 		return nil
+// 	}
+// 	return &NumberExpr{Value: value}
+// }
+
+func (p *Parser) ParseNumber() *NumberExpr {
+	var value float64
+	var err error
+
+	if p.curToken.Type == token.MINUS {
+		p.nextToken()
+		if p.curToken.Type != token.NUMBER {
+			p.errors = append(p.errors, "Expected a number after minus")
+			return nil
+		}
+		value, err = strconv.ParseFloat(p.curToken.Literal, 64)
+		if err != nil {
+			p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
+			return nil
+		}
+		value = -value 
+	} else if p.curToken.Type == token.NUMBER {
+		value, err = strconv.ParseFloat(p.curToken.Literal, 64)
+		if err != nil {
+			p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
+			return nil
+		}
+	} else {
+		p.errors = append(p.errors, "Expected a number or a minus sign")
 		return nil
 	}
+
 	return &NumberExpr{Value: value}
 }
 
 func (p *Parser) parseExpression() *BinaryExpr {
-	left := p.parseNumber()
+	left := p.ParseNumber()
 	if left == nil {
 		return nil
 	}
@@ -80,7 +110,7 @@ func (p *Parser) parseExpression() *BinaryExpr {
 		p.errors = append(p.errors, "Expected a number after operator")
 		return nil
 	}
-	right := p.parseNumber()
+	right := p.ParseNumber()
 	if right == nil {
 		return nil
 	}
