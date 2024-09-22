@@ -59,20 +59,12 @@ func (p *Parser) parseStatement() Node {
 	}
 }
 
-// func (p *Parser) ParseNumber() *NumberExpr {
-// 	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
-// 	if err != nil {
-// 		p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
-// 		return nil
-// 	}
-// 	return &NumberExpr{Value: value}
-// }
-
 func (p *Parser) ParseNumber() *NumberExpr {
 	var value float64
 	var err error
-
+	isNegative := false
 	if p.curToken.Type == token.MINUS {
+		isNegative = true
 		p.nextToken()
 		if p.curToken.Type != token.NUMBER {
 			p.errors = append(p.errors, "Expected a number after minus")
@@ -83,7 +75,7 @@ func (p *Parser) ParseNumber() *NumberExpr {
 			p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
 			return nil
 		}
-		value = -value 
+
 	} else if p.curToken.Type == token.NUMBER {
 		value, err = strconv.ParseFloat(p.curToken.Literal, 64)
 		if err != nil {
@@ -91,8 +83,11 @@ func (p *Parser) ParseNumber() *NumberExpr {
 			return nil
 		}
 	} else {
-		p.errors = append(p.errors, "Expected a number or a minus sign")
+		p.errors = append(p.errors, "Expected a number or a minus")
 		return nil
+	}
+	if isNegative {
+		value = -value
 	}
 
 	return &NumberExpr{Value: value}
