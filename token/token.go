@@ -19,6 +19,8 @@ const (
 	DIVIDE     TokenType = "/"
 	MODULUS    TokenType = "%"
 	EQUAL      TokenType = "=="
+	NOTEQUAL   TokenType = "!="
+	NOT        TokenType = "!"
 	COMMA      TokenType = ","
 	SEMICOLON  TokenType = ";"
 	COLON      TokenType = ":"
@@ -27,11 +29,38 @@ const (
 	CURLYCLOSE TokenType = "}"
 	BRACKOPEN  TokenType = "("
 	BRACKCLOSE TokenType = ")"
-	NUMBER     TokenType = "number"
-	STRING     TokenType = "string"
-	BOOLEAN    TokenType = "boolean"
-	NULL       TokenType = "null"
-	ARRAY      TokenType = "array"
+	NUM        TokenType = "num"
+	STRING     TokenType = "str"
+	BOOLEAN    TokenType = "bool"
+	NULL       TokenType = "nil"
+	ARRAY      TokenType = "arr"
 	OBJECT     TokenType = "object"
 	IDENTIFIER TokenType = "identifier"
+	GREATER    TokenType = ">"
+	LESS       TokenType = "<"
+	// Keywords
+	FUNCTION TokenType = "FUNCTION"
+	LET      TokenType = "LET"
+	TRUE     TokenType = "TRUE"
+	FALSE    TokenType = "FALSE"
+	IF       TokenType = "IF"
+	ELSE     TokenType = "ELSE"
+	RETURN   TokenType = "rtn"
 )
+
+var keywords = map[string]TokenType{
+	"fn":    FUNCTION,
+	"let":   LET,
+	"true":  TRUE,
+	"false": FALSE,
+	"if":    IF,
+	"else":  ELSE,
+	"rtn":   RETURN,
+}
+
+func LookupIdent(ident string) TokenType {
+	if tok, ok := keywords[ident]; ok {
+		return tok
+	}
+	return IDENT
+}
