@@ -44,7 +44,7 @@ func (p *Program) String() string {
 }
 
 type Num struct {
-	Value float64
+	Value int64
 	Token token.Token
 }
 
