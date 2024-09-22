@@ -1,37 +1,21 @@
 package eval
 
-import (
-	"github.com/kh3rld/ksm-lang/parser"
-)
+import "github.com/kh3rld/ksm-lang/ast"
 
 type Evaluator struct{}
 
-func (e *Evaluator) Eval(node parser.Node) *Number {
-	switch n := node.(type) {
-	case *parser.NumberExpr:
-		return &Number{Value: n.Value}
-	case *parser.BinaryExpr:
-		left := e.Eval(n.Left)
-		right := e.Eval(n.Right)
-		if left == nil || right == nil {
-			return nil
+func (e *Evaluator) Evaluate(node ast.Node) interface{} {
+	switch node := node.(type) {
+	case *ast.Num:
+		return node.Value
+	case *ast.InfixExpression:
+		left := e.Evaluate(node.Left)
+		right := e.Evaluate(node.Right)
+
+		switch node.Operator {
+		case "+":
+			return left.(int64) + right.(int64)
 		}
-		return EvaluateArithmetic(left, right, n.Operator)
 	}
 	return nil
-}
-
-func (e *Evaluator) VisitNumberExpr(expr *parser.NumberExpr) interface{} {
-	return &Number{Value: expr.Value}
-}
-
-func EvaluateArithmetic(left, right *Number, op string) *Number {
-	switch op {
-	case "+":
-		return left.Add(right)
-	case "-":
-		return left.Subtract(right)
-	default:
-		return nil
-	}
 }
