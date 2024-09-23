@@ -18,16 +18,18 @@ func main() {
 		os.Exit(1)
 	}
 	sourceFile := os.Args[1]
+
 	file, err := os.Open(sourceFile)
 	if err != nil {
 		log.Fatalf("Error opening file: %v", err)
 	}
 	defer file.Close()
-
 	scanner := bufio.NewScanner(file)
-	evaluator := &eval.Evaluator{}
 	for scanner.Scan() {
 		input := scanner.Text()
+
+		evaluator := &eval.Evaluator{}
+
 		le := lexer.New(string(input))
 
 		for token := le.NextToken(); token.Type != t.EOF; token = le.NextToken() {
@@ -48,7 +50,6 @@ func main() {
 		}
 		expression := p.ParseExpression()
 
-		// Check if the parsing was successful
 		if expression == nil {
 			if len(p.Errors()) > 0 {
 				log.Printf("Error parsing input '%s': %v", input, p.Errors())
@@ -57,16 +58,14 @@ func main() {
 			}
 			continue
 		}
-		// Evaluate the parsed expression using the evaluator
 		result := evaluator.Eval(expression)
 		if result == nil {
 			log.Printf("Error evaluating input '%s'", input)
 			continue
 		}
-
-		// Print the evaluated result
 		fmt.Printf("Evaluated result: %v\n", result.Value)
 	}
+
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Error reading file: %v", err)
 	}
