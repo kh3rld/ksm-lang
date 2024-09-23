@@ -51,9 +51,9 @@ func (p *Parser) Errors() []string {
 func (p *Parser) parseStatement() Node {
 	switch p.curToken.Type {
 	case token.NUMBER:
-		return p.parseExpression()
+		return p.ParseExpression()
 	case token.PLUS, token.MINUS:
-		return p.parseExpression()
+		return p.ParseExpression()
 	default:
 		return nil
 	}
@@ -98,7 +98,7 @@ func (p *Parser) ParseNumber() *NumberExpr {
 	return &NumberExpr{Value: value}
 }
 
-func (p *Parser) parseExpression() *BinaryExpr {
+func (p *Parser) ParseExpression() *BinaryExpr {
 	left := p.ParseNumber()
 	if left == nil {
 		return nil
