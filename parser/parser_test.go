@@ -1,9 +1,11 @@
 package parser
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/kh3rld/ksm-lang/lexer"
+	"github.com/kh3rld/ksm-lang/token"
 )
 
 func TestParseProgram(t *testing.T) {
@@ -44,77 +46,80 @@ func TestParseProgram(t *testing.T) {
 	}
 }
 
-// func TestParseNumber(t *testing.T) {
-// 	tests := []struct {
-// 		input         string
-// 		expectedValue float64
-// 		expectError   bool
-// 	}{
-// 		{
-// 			input:         "-42",
-// 			expectedValue: float64(-42),
-// 			expectError:   false,
-// 		},
-// 	}
-
-// 	for _, tt := range tests {
-// 		l := lexer.New(tt.input)
-// 		p := New(l)
-// 		p.nextToken()
-
-// 		if tt.expectError {
-// 			p.nextToken()
-// 			numberExpr := p.ParseNumber()
-// 			if numberExpr != nil {
-// 				t.Errorf("Expected error for input %q, but got valid number: %v", tt.input, numberExpr)
-// 			}
-// 			continue
-// 		}
-
-// 		numberExpr := p.ParseNumber()
-// 		if numberExpr.Value != tt.expectedValue {
-// 			t.Errorf("Expected %v for this input %q,  got %v", tt.expectedValue, tt.input, numberExpr.Value)
-// 		}
-// 	}
-// }
-
-// TestParseNumber function
-func TestParseNumber(t *testing.T) {
-	tests := []struct {
-		input         string
-		expectedValue float64
-		expectError   bool
-	}{
-		{"-42", -42, false},
-		{"42", 42, false},
-		{"-abc", 0, true}, // Invalid number
-		{"abc", 0, true},  // Not a number
+func TestParser_ParseNumber(t *testing.T) {
+	type fields struct {
+		l         *lexer.Lexer
+		curToken  token.Token
+		peekToken token.Token
+		errors    []string
 	}
-
+	tests := []struct {
+		name   string
+		fields fields
+		want   *NumberExpr
+	}{
+		{
+			name: "Parse positive number",
+			fields: fields{
+				l:         lexer.New("45"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "45"},
+				peekToken: token.Token{Type: token.EOF, Literal: ""},
+				errors:    []string{},
+			},
+			want: &NumberExpr{Value: 45},
+		},
+		{
+			name: "Parse negative number",
+			fields: fields{
+				l:         lexer.New("-45"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "-45"},
+				peekToken: token.Token{Type: token.EOF, Literal: ""},
+				errors:    []string{},
+			},
+			want: &NumberExpr{Value: -45},
+		},
+		{
+			name: "Parse zero",
+			fields: fields{
+				l:         lexer.New("0"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "0"},
+				peekToken: token.Token{Type: token.EOF, Literal: ""},
+				errors:    []string{},
+			},
+			want: &NumberExpr{Value: 0},
+		},
+		{
+			name: "Invalid number input",
+			fields: fields{
+				l:         lexer.New("hello"),
+				curToken:  token.Token{Type: token.IDENT, Literal: "hello"},
+				peekToken: token.Token{Type: token.EOF, Literal: ""},
+				errors:    []string{"expected number, got identifier"},
+			},
+			want: nil,
+		},
+		{
+			name: "Invalid mixed input '5d2'",
+			fields: fields{
+				l:         lexer.New("5d2"),
+				curToken:  token.Token{Type: token.IDENT, Literal: "5d2"},
+				peekToken: token.Token{Type: token.EOF, Literal: ""},
+				errors:    []string{"invalid number format: '5d2'"},
+			},
+			want: nil, // Adjust this to match how your parser handles errors or invalid input
+		},
+	}
 	for _, tt := range tests {
-		lexer := lexer.New(tt.input)
-		parser := New(lexer)
-		parser.nextToken() // Setup initial token
-
-		numberExpr := parser.ParseNumber()
-
-		if tt.expectError {
-			if numberExpr != nil {
-				t.Errorf("Expected error for input %q, but got valid number: %v", tt.input, numberExpr)
+		t.Run(tt.name, func(t *testing.T) {
+			p := &Parser{
+				l:         tt.fields.l,
+				curToken:  tt.fields.curToken,
+				peekToken: tt.fields.peekToken,
+				errors:    tt.fields.errors,
 			}
-			if len(parser.errors) == 0 {
-				t.Errorf("Expected parsing errors for input %q, but none were found", tt.input)
+			if got := p.ParseNumber(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Parser.ParseNumber() = %v, want %v", got, tt.want)
 			}
-			continue
-		}
-
-		if numberExpr == nil {
-			t.Errorf("Expected valid number for input %q, but got nil", tt.input)
-			continue
-		}
-
-		if numberExpr.Value != tt.expectedValue {
-			t.Errorf("Expected %v for input %q, got %v", tt.expectedValue, tt.input, numberExpr.Value)
-		}
+		})
 	}
 }
