@@ -82,8 +82,13 @@ func (p *Parser) ParseNumber() *NumberExpr {
 			p.errors = append(p.errors, fmt.Sprintf("Error parsing number: %s", err))
 			return nil
 		}
+		p.nextToken()
+		if p.curToken.Type != token.EOF {
+			p.errors = append(p.errors, fmt.Sprintf("Invalid characters after number: %s", p.curToken.Literal))
+			return nil
+		}
 	} else {
-		p.errors = append(p.errors, "Expected a number or a minus")
+		p.errors = append(p.errors, "Expected a number")
 		return nil
 	}
 	if isNegative {
