@@ -1,6 +1,8 @@
 package eval
 
 import (
+	"log"
+
 	"github.com/kh3rld/ksm-lang/parser"
 )
 
@@ -32,6 +34,7 @@ func EvaluateArithmetic(left, right *Number, op string) *Number {
 	case "-":
 		return left.Subtract(right)
 	default:
+		log.Printf("Unexpected node type: %T\n", op)
 		return nil
 	}
 }
