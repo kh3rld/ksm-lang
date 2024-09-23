@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/kh3rld/ksm-lang/eval"
 	"github.com/kh3rld/ksm-lang/lexer"
 	"github.com/kh3rld/ksm-lang/parser"
 	t "github.com/kh3rld/ksm-lang/token"
@@ -24,6 +25,7 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+	evaluator := &eval.Evaluator{}
 	for scanner.Scan() {
 		input := scanner.Text()
 		le := lexer.New(string(input))
@@ -44,6 +46,26 @@ func main() {
 		} else {
 			fmt.Printf("%v\n", numberExpr.Value)
 		}
+		expression := p.ParseExpression()
+
+		// Check if the parsing was successful
+		if expression == nil {
+			if len(p.Errors()) > 0 {
+				log.Printf("Error parsing input '%s': %v", input, p.Errors())
+			} else {
+				log.Printf("Unexpected error for input '%s': nil returned but no errors recorded.\n", input)
+			}
+			continue
+		}
+		// Evaluate the parsed expression using the evaluator
+		result := evaluator.Eval(expression)
+		if result == nil {
+			log.Printf("Error evaluating input '%s'", input)
+			continue
+		}
+
+		// Print the evaluated result
+		fmt.Printf("Evaluated result: %v\n", result.Value)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Error reading file: %v", err)
