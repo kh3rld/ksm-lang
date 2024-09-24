@@ -123,3 +123,92 @@ func TestParser_ParseNumber(t *testing.T) {
 		})
 	}
 }
+
+func TestParser_ParseExpression(t *testing.T) {
+	type fields struct {
+		l         *lexer.Lexer
+		curToken  token.Token
+		peekToken token.Token
+		errors    []string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *BinaryExpr
+	}{
+		{
+			name: "Simple addition",
+			fields: fields{
+				l:         lexer.New("2 + 3"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "2"},
+				peekToken: token.Token{Type: token.PLUS, Literal: "+"},
+			},
+			want: &BinaryExpr{
+				Left:     &NumberExpr{Value: 2},
+				Operator: "+",
+				Right:    &NumberExpr{Value: 3},
+			},
+		},
+		{
+			name: "Simple subtraction",
+			fields: fields{
+				l:         lexer.New("5 - 1"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "5"},
+				peekToken: token.Token{Type: token.MINUS, Literal: "-"},
+			},
+			want: &BinaryExpr{
+				Left:     &NumberExpr{Value: 5},
+				Operator: "-",
+				Right:    &NumberExpr{Value: 1},
+			},
+		},
+		{
+			name: "Addition and subtraction",
+			fields: fields{
+				l:         lexer.New("1 + 2 - 3"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "1"},
+				peekToken: token.Token{Type: token.PLUS, Literal: "+"},
+			},
+			want: &BinaryExpr{
+				Left: &BinaryExpr{
+					Left:     &NumberExpr{Value: 1},
+					Operator: "+",
+					Right:    &NumberExpr{Value: 2},
+				},
+				Operator: "-",
+				Right:    &NumberExpr{Value: 3},
+			},
+		},
+		{
+			name: "Complex expression",
+			fields: fields{
+				l:         lexer.New("3 + 5 - 2"),
+				curToken:  token.Token{Type: token.NUMBER, Literal: "3"},
+				peekToken: token.Token{Type: token.PLUS, Literal: "+"},
+			},
+			want: &BinaryExpr{
+				Left: &BinaryExpr{
+					Left:     &NumberExpr{Value: 3},
+					Operator: "+",
+					Right:    &NumberExpr{Value: 5},
+				},
+				Operator: "-",
+				Right:    &NumberExpr{Value: 2},
+			},
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &Parser{
+				l:         tt.fields.l,
+				curToken:  tt.fields.curToken,
+				peekToken: tt.fields.peekToken,
+				errors:    tt.fields.errors,
+			}
+			if got := p.ParseExpression(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Parser.ParseExpression() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
