@@ -66,7 +66,7 @@ func (p *Parser) ParseNumber() *NumberExpr {
 	if p.curToken.Type == token.MINUS {
 		p.nextToken()
 		if p.curToken.Type != token.NUMBER {
-			p.errors = append(p.errors, "Expected a number after minus")
+			p.errors = append(p.errors, "Expected a number after sign")
 			return nil
 		}
 		value, err = strconv.ParseFloat(p.curToken.Literal, 64)
@@ -82,7 +82,7 @@ func (p *Parser) ParseNumber() *NumberExpr {
 			return nil
 		}
 	} else {
-		p.errors = append(p.errors, "Expected a number or a minus sign")
+		p.errors = append(p.errors, "Expected a number or a sign")
 		return nil
 	}
 
