@@ -196,7 +196,6 @@ func TestParser_ParseExpression(t *testing.T) {
 				Right:    &NumberExpr{Value: 2},
 			},
 		},
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
