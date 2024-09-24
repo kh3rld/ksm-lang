@@ -18,16 +18,12 @@ func (e *Evaluator) Eval(node parser.Node) *Number {
 		if left == nil || right == nil {
 			return nil
 		}
-		return EvaluateArithmetic(left, right, n.Operator)
+		return EvaluateArithmetic(left, n.Operator, right)
 	}
 	return nil
 }
 
-func (e *Evaluator) VisitNumberExpr(expr *parser.NumberExpr) interface{} {
-	return &Number{Value: expr.Value}
-}
-
-func EvaluateArithmetic(left, right *Number, op string) *Number {
+func EvaluateArithmetic(left *Number, op string, right *Number) *Number {
 	switch op {
 	case "+":
 		return left.Add(right)
