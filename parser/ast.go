@@ -30,4 +30,3 @@ type BinaryExpr struct {
 func (b *BinaryExpr) Accept(visitor Visitor) interface{} {
 	return visitor.VisitBinaryExpr(b)
 }
-

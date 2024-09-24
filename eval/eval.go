@@ -1,6 +1,8 @@
 package eval
 
 import (
+	"log"
+
 	"github.com/kh3rld/ksm-lang/parser"
 )
 
@@ -16,19 +18,19 @@ func (e *Evaluator) Eval(node parser.Node) *Number {
 		if left == nil || right == nil {
 			return nil
 		}
-		return EvaluateArithmetic(left, right, n.Operator)
-
-func (e *Evaluator) VisitNumberExpr(expr *parser.NumberExpr) interface{} {
-	return &Number{Value: expr.Value}
+		return EvaluateArithmetic(left, n.Operator, right)
+	}
+	return nil
 }
 
-func EvaluateArithmetic(left, right *Number, op string) *Number {
+func EvaluateArithmetic(left *Number, op string, right *Number) *Number {
 	switch op {
 	case "+":
 		return left.Add(right)
 	case "-":
 		return left.Subtract(right)
 	default:
+		log.Printf("Unexpected node type: %T\n", op)
 		return nil
 	}
 }
