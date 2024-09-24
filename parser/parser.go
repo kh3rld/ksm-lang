@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/kh3rld/ksm-lang/lexer"
@@ -39,7 +40,10 @@ func (p *Parser) ParseProgram() *Program {
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
-		p.nextToken()
+		if stmt != nil {
+			p.nextToken()
+		}
+
 	}
 	return program
 }
@@ -50,9 +54,10 @@ func (p *Parser) Errors() []string {
 
 func (p *Parser) parseStatement() Node {
 	switch p.curToken.Type {
-	case token.NUMBER:
+	case token.NUMBER, token.MINUS:
 		return p.ParseExpression()
-	case token.PLUS, token.MINUS:
+	case token.PLUS:
+		p.nextToken()
 		return p.ParseExpression()
 	default:
 		return nil
@@ -94,21 +99,22 @@ func (p *Parser) ParseExpression() *BinaryExpr {
 	if left == nil {
 		return nil
 	}
+	operator := p.curToken.Literal
 
-	operator := p.curToken
-	p.nextToken()
-	if p.curToken.Type != token.NUMBER {
-		p.errors = append(p.errors, "Expected a number after operator")
-		return nil
-	}
 	right := p.ParseNumber()
-	if right == nil {
-		return nil
+
+	for operator == "+" || operator == "-" {
+		p.nextToken()
+		if right == nil {
+			p.errors = append(p.errors, "Expected a number after operator")
+			return nil
+		}
 	}
 
+	log.Printf("Evaluating: %v %s %v\n", left.Value, operator, right.Value)
 	return &BinaryExpr{
 		Left:     left,
-		Operator: operator.Literal,
+		Operator: operator,
 		Right:    right,
 	}
 }
