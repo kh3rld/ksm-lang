@@ -106,7 +106,7 @@ func TestParser_ParseNumber(t *testing.T) {
 				peekToken: token.Token{Type: token.EOF, Literal: ""},
 				errors:    []string{"invalid number format: '5d2'"},
 			},
-			want: nil, // Adjust this to match how your parser handles errors or invalid input
+			want: nil,
 		},
 	}
 	for _, tt := range tests {
