@@ -58,7 +58,7 @@ func TestEvaluator_Eval(t *testing.T) {
 				node: &parser.BinaryExpr{
 					Left:     &parser.NumberExpr{Value: 13},
 					Right:    &parser.NumberExpr{Value: 5},
-					Operator: "+",
+					Operator: "-",
 				},
 			},
 			want: &Number{Value: 8},
