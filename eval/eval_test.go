@@ -51,6 +51,18 @@ func TestEvaluator_Eval(t *testing.T) {
 			},
 			want: &Number{Value: 1},
 		},
+		{
+			name: "Substraction of two numbers",
+			e:    &Evaluator{},
+			args: args{
+				node: &parser.BinaryExpr{
+					Left:     &parser.NumberExpr{Value: 13},
+					Right:    &parser.NumberExpr{Value: 5},
+					Operator: "+",
+				},
+			},
+			want: &Number{Value: 8},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
